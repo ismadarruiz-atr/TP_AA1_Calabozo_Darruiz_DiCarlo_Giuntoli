@@ -2,8 +2,8 @@
 Implementaciones de descenso del gradiente para regresión lineal.
 
 Funciones tomadas de la notebook de la cátedra
-(Implementaciones_Descenso_del_Gradiente.ipynb), con las siguientes
-adaptaciones para poder reutilizarlas desde TP-regresion-AA1.ipynb:
+(referencia/implementaciones-descenso-gradiente-catedra.ipynb), con las
+siguientes adaptaciones para poder reutilizarlas desde TP-regresion-AA1.ipynb:
 
 - Aceptan DataFrames/Series de pandas además de arrays de NumPy.
 - Devuelven, además de los pesos W, el historial de MSE de entrenamiento y
@@ -11,8 +11,9 @@ adaptaciones para poder reutilizarlas desde TP-regresion-AA1.ipynb:
 - En los tres métodos el MSE se registra una vez por época y sobre el
   conjunto completo, así las curvas de GD, SGD y Mini-Batch son comparables
   entre sí (loss vs epochs).
-- El gráfico es opcional (parámetro `graficar`) y se puede fijar una
-  `semilla` para que los resultados sean reproducibles.
+- El gráfico es opcional (parámetro `graficar`), y se le puede cambiar el
+  título (`titulo`) y la etiqueta de la segunda curva (`etiqueta_val`).
+- Se puede fijar una `semilla` para que los resultados sean reproducibles.
 - En Mini-Batch el gradiente se divide por el tamaño real del lote (el
   último lote puede tener menos de `batch_size` muestras).
 
@@ -60,7 +61,8 @@ def predecir(X, W):
     return np.matmul(_agregar_bias(X), W).ravel()
 
 
-def graficar_errores(train_errors, val_errors, titulo, label_val='Error de validación'):
+def graficar_errores(train_errors, val_errors, titulo,
+                     label_val='Error de validación'):
     """Grafica la evolución del MSE de entrenamiento y validación por época."""
     plt.figure(figsize=(12, 6))
     plt.plot(train_errors, label='Error de entrenamiento')
@@ -73,7 +75,8 @@ def graficar_errores(train_errors, val_errors, titulo, label_val='Error de valid
 
 
 def gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=100,
-                     semilla=None, graficar=True):
+                     semilla=None, graficar=True, titulo=None,
+                     etiqueta_val='Error de validación'):
     """
     Entrena un modelo de regresión lineal mediante Gradient Descent (batch).
 
@@ -98,6 +101,10 @@ def gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=100,
         Semilla para la inicialización aleatoria de los pesos.
     graficar : bool, optional
         Si es True, grafica el MSE de entrenamiento y validación por época.
+    titulo : str, optional
+        Título del gráfico. Por defecto, el de la notebook de la cátedra.
+    etiqueta_val : str, optional
+        Etiqueta de la curva de error de X_val, y_val en el gráfico.
 
     Retorna
     -------
@@ -130,7 +137,8 @@ def gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=100,
     val_errors = []    # MSE de validación en cada época
 
     for _ in range(epochs):
-        # Calcular el gradiente con todo el conjunto de entrenamiento y actualizar pesos
+        # Calcular el gradiente con todo el conjunto de entrenamiento y
+        # actualizar pesos
         error = y_train - np.matmul(X_train, W)
         gradient = -2 / n * np.matmul(X_train.T, error)
         W = W - lr * gradient
@@ -140,16 +148,20 @@ def gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=100,
         val_errors.append(_mse(X_val, y_val, W))
 
     if graficar:
-        graficar_errores(train_errors, val_errors,
-                         'Error de entrenamiento y validación vs épocas (GD)')
+        graficar_errores(
+            train_errors, val_errors,
+            titulo or 'Error de entrenamiento y validación vs épocas (GD)',
+            etiqueta_val)
 
     return W, train_errors, val_errors
 
 
-def stochastic_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=100,
-                                semilla=None, graficar=True):
+def stochastic_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01,
+                                epochs=100, semilla=None, graficar=True,
+                                titulo=None,
+                                etiqueta_val='Error de validación'):
     """
-    Entrena un modelo de regresión lineal mediante Stochastic Gradient Descent (SGD).
+    Entrena una regresión lineal mediante Stochastic Gradient Descent (SGD).
 
     A diferencia de Gradient Descent, que calcula el gradiente con todas las
     muestras antes de actualizar los pesos, SGD actualiza los pesos después
@@ -157,7 +169,8 @@ def stochastic_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=
 
     Parámetros
     ----------
-    X_train, y_train, X_val, y_val, lr, epochs, semilla, graficar :
+    X_train, y_train, X_val, y_val, lr, epochs, semilla, graficar, titulo,
+    etiqueta_val :
         Igual que en `gradient_descent`.
 
     Retorna
@@ -193,7 +206,8 @@ def stochastic_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=
         y_train = y_train[permutation]
 
         for j in range(n):
-            # Tomar una única muestra, calcular su gradiente y actualizar los pesos
+            # Tomar una única muestra, calcular su gradiente y actualizar
+            # los pesos
             x_sample = X_train[j:j + 1]  # (1, m)
             y_sample = y_train[j:j + 1]  # (1, 1)
 
@@ -206,14 +220,18 @@ def stochastic_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=
         val_errors.append(_mse(X_val, y_val, W))
 
     if graficar:
-        graficar_errores(train_errors, val_errors,
-                         'Error de entrenamiento y validación vs épocas (SGD)')
+        graficar_errores(
+            train_errors, val_errors,
+            titulo or 'Error de entrenamiento y validación vs épocas (SGD)',
+            etiqueta_val)
 
     return W, train_errors, val_errors
 
 
-def mini_batch_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=100,
-                                batch_size=11, semilla=None, graficar=True):
+def mini_batch_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01,
+                                epochs=100, batch_size=11, semilla=None,
+                                graficar=True, titulo=None,
+                                etiqueta_val='Error de validación'):
     """
     Entrena un modelo de regresión lineal mediante Mini-Batch Gradient Descent.
 
@@ -223,7 +241,8 @@ def mini_batch_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=
 
     Parámetros
     ----------
-    X_train, y_train, X_val, y_val, lr, epochs, semilla, graficar :
+    X_train, y_train, X_val, y_val, lr, epochs, semilla, graficar, titulo,
+    etiqueta_val :
         Igual que en `gradient_descent`.
     batch_size : int, optional
         Cantidad de muestras utilizadas en cada actualización. Por defecto 11.
@@ -263,7 +282,8 @@ def mini_batch_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=
         y_train = y_train[permutation]
 
         for j in range(0, n, batch_size):
-            # Obtener un lote (mini-batch), calcular su gradiente y actualizar los pesos
+            # Obtener un lote (mini-batch), calcular su gradiente y
+            # actualizar los pesos
             x_batch = X_train[j:j + batch_size]
             y_batch = y_train[j:j + batch_size]
 
@@ -276,7 +296,10 @@ def mini_batch_gradient_descent(X_train, y_train, X_val, y_val, lr=0.01, epochs=
         val_errors.append(_mse(X_val, y_val, W))
 
     if graficar:
-        graficar_errores(train_errors, val_errors,
-                         'Error de entrenamiento y validación vs épocas (Mini-Batch GD)')
+        graficar_errores(
+            train_errors, val_errors,
+            titulo or ('Error de entrenamiento y validación vs épocas '
+                       '(Mini-Batch GD)'),
+            etiqueta_val)
 
     return W, train_errors, val_errors
