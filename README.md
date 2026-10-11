@@ -33,10 +33,10 @@ Cada trabajo práctico está en su propia carpeta, con un README que explica su 
 
 ## Entorno
 
-Requiere Python 3.11 o superior. Desde la raíz del repositorio:
+Requiere Python 3.11 o superior (probado con 3.14). Desde la raíz del repositorio, en Git Bash:
 
 ```bash
-python -m venv .venv
+py -3.14 -m venv .venv                 # en Linux o macOS: python3 -m venv .venv
 source .venv/Scripts/activate          # en Linux o macOS: source .venv/bin/activate
 pip install -r requirements.txt
 ```
