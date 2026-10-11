@@ -26,7 +26,9 @@ Cada trabajo práctico está en su propia carpeta, con un README que explica su 
 │   ├── src/                         Implementaciones de descenso por gradiente
 │   └── referencia/                  Consigna y notebooks de la cátedra
 └── TP_2/                            TP de clasificación
-    └── TP-clasificacion-AA1.ipynb
+    ├── TP-clasificacion-AA1.ipynb
+    ├── data/                        Dataset (weatherAUS_2026C2.csv)
+    └── referencia/                  Consigna
 ```
 
 ## Entorno
