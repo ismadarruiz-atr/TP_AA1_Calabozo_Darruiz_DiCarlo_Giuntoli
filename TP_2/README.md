@@ -15,7 +15,7 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
 |---|---|---|---|
 | 1 | Análisis descriptivo y preparación de los datos | 30/10 | Hecho |
 | 2 | Regresión logística: métricas, curva ROC y umbral | 30/10 | Hecho |
-| 3 | Modelos base | 30/10 | Pendiente |
+| 3 | Modelos base | 30/10 | Hecho |
 | 4 | Optimización de hiperparámetros | 13/11 | Pendiente |
 | 5 | Explicabilidad | 13/11 | Pendiente |
 | 6 | AutoML con PyCaret | 13/11 | Pendiente |
