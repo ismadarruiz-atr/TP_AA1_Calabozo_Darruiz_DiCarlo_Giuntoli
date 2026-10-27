@@ -14,7 +14,7 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
 | Ítem | Contenido | Entrega | Estado |
 |---|---|---|---|
 | 1 | Análisis descriptivo y preparación de los datos | 30/10 | Hecho |
-| 2 | Regresión logística: métricas, curva ROC y umbral | 30/10 | Pendiente |
+| 2 | Regresión logística: métricas, curva ROC y umbral | 30/10 | Hecho |
 | 3 | Modelos base | 30/10 | Pendiente |
 | 4 | Optimización de hiperparámetros | 13/11 | Pendiente |
 | 5 | Explicabilidad | 13/11 | Pendiente |
@@ -37,6 +37,9 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
     (`Rainfall` y `Evaporation`).
   - En el `ColumnTransformer` `preprocesador`: `StandardScaler` para las numéricas, y one-hot para `Location`
     (con todas sus columnas, por si aparece una ciudad nueva) y para `RainToday` (una sola columna 0/1).
+- **Modelo:** regresión logística con `class_weight='balanced'`, en un `Pipeline` con `preprocesador`.
+- **Métrica principal: F1 de la clase "llueve".** El umbral de decisión se elige en validación, donde se cruzan
+  la precisión y el recall.
 
 Para el ítem 9: la codificación cíclica, la imputación por ciudad y el logaritmo se hacen con pandas, fuera del
 `Pipeline`, así que el script de inferencia va a tener que repetirlos, con las medianas por ciudad de
