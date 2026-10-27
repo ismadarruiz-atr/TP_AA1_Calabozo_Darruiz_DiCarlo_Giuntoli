@@ -31,19 +31,20 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
   para decidir y la prueba, solo para medir el resultado final de cada modelo.
 - `RainfallTomorrow` se descarta porque es información del día siguiente (fuga de datos).
 - **Preparación de los datos** (sección 1.8 del notebook, siguiendo el apunte de la Unidad 0):
-  - Con pandas, igual en los tres conjuntos: codificación cíclica (seno y coseno) de las direcciones del viento y
-    del mes, imputación de las numéricas con la mediana de su ciudad calculada en entrenamiento (la mediana
-    general si la ciudad nunca mide esa variable) y logaritmo de las variables con asimetría mayor a 1
-    (`Rainfall` y `Evaporation`).
-  - En el `ColumnTransformer` `preprocesador`: `StandardScaler` para las numéricas, y one-hot para `Location`
-    (con todas sus columnas, por si aparece una ciudad nueva) y para `RainToday` (una sola columna 0/1).
-- **Modelo:** regresión logística con `class_weight='balanced'`, en un `Pipeline` con `preprocesador`.
+  - Con pandas, igual en los tres conjuntos, porque son fórmulas fijas: codificación cíclica (seno y coseno) de
+    las direcciones del viento y del mes, y logaritmo de las variables con asimetría mayor a 1 (`Rainfall` y
+    `Evaporation`).
+  - En el `ColumnTransformer` `preprocesador`, ajustado solo con entrenamiento: `StandardScaler` y `KNNImputer`
+    (k = 5) para las numéricas, y moda y one-hot para `Location` (con todas sus columnas, por si aparece una
+    ciudad nueva) y `RainToday` (una sola columna 0/1). Se ajusta una sola vez, porque KNN tarda varios
+    minutos, y los modelos se entrenan con los datos ya transformados.
+- **Modelo:** regresión logística con `class_weight='balanced'`.
 - **Métrica principal: F1 de la clase "llueve".** El umbral de decisión se elige en validación, donde se cruzan
   la precisión y el recall.
 
-Para el ítem 9: la codificación cíclica, la imputación por ciudad y el logaritmo se hacen con pandas, fuera del
-`Pipeline`, así que el script de inferencia va a tener que repetirlos, con las medianas por ciudad de
-entrenamiento guardadas junto al modelo.
+Para el ítem 9: la codificación cíclica y el logaritmo se hacen con pandas, así que el script de inferencia tiene
+que repetirlos antes de usar `preprocesador` y el modelo. Lo que se aprende de los datos ya está en
+`preprocesador`. El umbral de decisión también hay que guardarlo.
 
 ## Entorno
 
@@ -75,7 +76,8 @@ primero, TensorFlow falla con `DLL load failed`. Por eso, cuando se use la red n
 ## Cómo ejecutar
 
 Abrir el notebook con el kernel de `TP_2/.venv`. Lee `data/weatherAUS_2026C2.csv` con una ruta relativa, así que
-necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos.
+necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos. Corre completo en unos
+15 minutos, casi todo por `KNNImputer`.
 
 ## Estructura
 
