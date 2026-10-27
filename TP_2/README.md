@@ -37,7 +37,8 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
   - En el `ColumnTransformer` `preprocesador`, ajustado solo con entrenamiento: `StandardScaler` y `KNNImputer`
     (k = 5) para las numéricas, y moda y one-hot para `Location` (con todas sus columnas, por si aparece una
     ciudad nueva) y `RainToday` (una sola columna 0/1). Se ajusta una sola vez, porque KNN tarda varios
-    minutos, y los modelos se entrenan con los datos ya transformados.
+    minutos (se guarda en `data/preprocesado.joblib`), y los modelos se entrenan con los datos ya
+    transformados.
 - **Modelo:** regresión logística con `class_weight='balanced'`.
 - **Métrica principal: F1 de la clase "llueve".** El umbral de decisión se elige en validación, donde se cruzan
   la precisión y el recall.
@@ -76,8 +77,12 @@ primero, TensorFlow falla con `DLL load failed`. Por eso, cuando se use la red n
 ## Cómo ejecutar
 
 Abrir el notebook con el kernel de `TP_2/.venv`. Lee `data/weatherAUS_2026C2.csv` con una ruta relativa, así que
-necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos. Corre completo en unos
-15 minutos, casi todo por `KNNImputer`.
+necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos.
+
+La primera ejecución tarda unos 15 minutos, casi todo por `KNNImputer`. El preprocesador ajustado y los datos
+preparados se guardan en `data/preprocesado.joblib`, que no se versiona, y las ejecuciones siguientes los cargan
+de ahí y tardan menos de un minuto. **Si se cambia algo de la preparación de los datos (sección 1.8 o
+anteriores), hay que borrar ese archivo** para que se vuelva a calcular.
 
 ## Estructura
 
@@ -87,7 +92,8 @@ TP_2/
 ├── requirements.txt                Dependencias de Python del TP2
 ├── TP-clasificacion-AA1.ipynb      Notebook con todo el desarrollo
 ├── data/
-│   └── weatherAUS_2026C2.csv       Dataset
+│   ├── weatherAUS_2026C2.csv       Dataset
+│   └── preprocesado.joblib         Datos preparados que guarda el notebook (no se versiona)
 └── referencia/
     └── consigna-TP2.pdf            Consigna
 ```
