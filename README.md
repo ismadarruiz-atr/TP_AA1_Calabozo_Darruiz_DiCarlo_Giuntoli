@@ -6,10 +6,10 @@ Trabajos prácticos de **Aprendizaje Automático 1**, Tecnicatura en Inteligenci
 
 ## Contenido
 
-| Carpeta          | Trabajo práctico                          | Estado    |
-| ---------------- | ----------------------------------------- | --------- |
-| [`TP_1/`](TP_1/) | Regresión: predicción de precios de casas | Completo  |
-| [`TP_2/`](TP_2/) | Clasificación                             | Pendiente |
+| Carpeta          | Trabajo práctico                                 | Estado   |
+| ---------------- | ------------------------------------------------ | -------- |
+| [`TP_1/`](TP_1/) | Regresión: predicción de precios de casas        | Completo |
+| [`TP_2/`](TP_2/) | Clasificación: predicción de lluvia en Australia | En curso |
 
 Cada trabajo práctico está en su propia carpeta, con un README que explica su contenido.
 
@@ -18,15 +18,17 @@ Cada trabajo práctico está en su propia carpeta, con un README que explica su 
 ```
 .
 ├── README.md
-├── requirements.txt                 Dependencias de Python
+├── requirements.txt                 Dependencias de Python (TP1)
 ├── TP_1/                            TP de regresión (ver TP_1/README.md)
 │   ├── README.md
 │   ├── TP-regresion-AA1.ipynb       Notebook principal (informe completo)
 │   ├── data/                        Dataset
 │   ├── src/                         Implementaciones de descenso por gradiente
 │   └── referencia/                  Consigna y notebooks de la cátedra
-└── TP_2/                            TP de clasificación
-    ├── TP-clasificacion-AA1.ipynb
+└── TP_2/                            TP de clasificación (ver TP_2/README.md)
+    ├── README.md
+    ├── requirements.txt             Dependencias de Python del TP2
+    ├── TP-clasificacion-AA1.ipynb   Notebook principal
     ├── data/                        Dataset (weatherAUS_2026C2.csv)
     └── referencia/                  Consigna
 ```
@@ -42,3 +44,6 @@ pip install -r requirements.txt
 ```
 
 Después se abren los notebooks con el kernel de `.venv`, desde VS Code o Jupyter.
+
+El TP2 tiene su propio entorno, con Python 3.11, porque PyCaret no funciona en versiones más nuevas. Se arma
+desde `TP_2/`, como se explica en su [README](TP_2/README.md#entorno).
