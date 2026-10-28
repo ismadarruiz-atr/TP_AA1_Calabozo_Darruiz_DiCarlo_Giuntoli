@@ -64,7 +64,11 @@ Por eso usa **Python 3.11** (de python.org) y las versiones de [`requirements.tx
 py -3.11 -m venv .venv                 # en Linux o macOS: python3.11 -m venv .venv
 source .venv/Scripts/activate          # en Linux o macOS: source .venv/bin/activate
 pip install -r requirements.txt
+python -m ipykernel install --user --name aa1-tp2 --display-name "Python 3.11 (AA1 TP2)"
 ```
+
+La última línea registra el entorno como kernel de Jupyter. El notebook lo pide por ese nombre, y en VS Code
+aparece en **Select Kernel → Jupyter Kernel…**, aunque la carpeta abierta no sea `TP_2/`.
 
 El entorno ocupa unos 2.6 GB, sobre todo por TensorFlow. Si falta Python 3.11, en Windows se instala con
 `winget install Python.Python.3.11`.
@@ -76,7 +80,7 @@ primero, TensorFlow falla con `DLL load failed`. Por eso, cuando se use la red n
 
 ## Cómo ejecutar
 
-Abrir el notebook con el kernel de `TP_2/.venv`. Lee `data/weatherAUS_2026C2.csv` con una ruta relativa, así que
+Abrir el notebook con el kernel **Python 3.11 (AA1 TP2)**. Lee `data/weatherAUS_2026C2.csv` con una ruta relativa, así que
 necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos.
 
 La primera ejecución tarda unos 15 minutos, casi todo por `KNNImputer`. El preprocesador ajustado y los datos
