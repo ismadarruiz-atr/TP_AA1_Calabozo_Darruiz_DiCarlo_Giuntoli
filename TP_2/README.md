@@ -30,22 +30,22 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
   validación de julio de 2015 a junio de 2016 y prueba de julio de 2016 a junio de 2017. La validación se usa
   para decidir y la prueba, solo para medir el resultado final de cada modelo.
 - `RainfallTomorrow` se descarta porque es información del día siguiente (fuga de datos).
-- **Preparación de los datos** (sección 1.8 del notebook, siguiendo el apunte de la Unidad 0):
-  - Con pandas, igual en los tres conjuntos, porque son fórmulas fijas: codificación cíclica (seno y coseno) de
-    las direcciones del viento y del mes, y logaritmo de las variables con asimetría mayor a 1 (`Rainfall` y
-    `Evaporation`).
+- **Preparación de los datos** (sección 1.9 del notebook, siguiendo el apunte de la Unidad 0):
+  - En la función `preparar_columnas`, igual para los tres conjuntos, porque son fórmulas fijas: codificación
+    cíclica (seno y coseno) de las direcciones del viento y del mes, con seno y coseno en 0 en los días sin
+    viento, y logaritmo de las variables con asimetría mayor a 1 (`Rainfall` y `Evaporation`).
   - En el `ColumnTransformer` `preprocesador`, ajustado solo con entrenamiento: `StandardScaler` y `KNNImputer`
     (k = 5) para las numéricas, y moda y one-hot para `Location` (con todas sus columnas, por si aparece una
     ciudad nueva) y `RainToday` (una sola columna 0/1). Se ajusta una sola vez, porque KNN tarda varios
     minutos (se guarda en `data/preprocesado.joblib`), y los modelos se entrenan con los datos ya
     transformados.
 - **Modelo:** regresión logística con `class_weight='balanced'`.
-- **Métrica principal: F1 de la clase "llueve".** El umbral de decisión se elige en validación, donde se cruzan
-  la precisión y el recall.
+- **Métrica principal: recall de la clase "llueve"**, con la condición de que la precisión sea de al menos 0.5
+  (que no haya más falsas alarmas que lluvias detectadas). El umbral de decisión se elige en validación: el de
+  mayor recall entre los que cumplen esa condición.
 
-Para el ítem 9: la codificación cíclica y el logaritmo se hacen con pandas, así que el script de inferencia tiene
-que repetirlos antes de usar `preprocesador` y el modelo. Lo que se aprende de los datos ya está en
-`preprocesador`. El umbral de decisión también hay que guardarlo.
+Para el ítem 9: el script de inferencia tiene que aplicar `preparar_columnas` antes de usar `preprocesador` y el
+modelo. Lo que se aprende de los datos ya está en `preprocesador`. El umbral de decisión también hay que guardarlo.
 
 ## Entorno
 
@@ -85,7 +85,7 @@ necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen
 
 La primera ejecución tarda unos 15 minutos, casi todo por `KNNImputer`. El preprocesador ajustado y los datos
 preparados se guardan en `data/preprocesado.joblib`, que no se versiona, y las ejecuciones siguientes los cargan
-de ahí y tardan menos de un minuto. **Si se cambia algo de la preparación de los datos (sección 1.8 o
+de ahí y tardan menos de un minuto. **Si se cambia algo de la preparación de los datos (sección 1.9 o
 anteriores), hay que borrar ese archivo** para que se vuelva a calcular.
 
 ## Estructura
