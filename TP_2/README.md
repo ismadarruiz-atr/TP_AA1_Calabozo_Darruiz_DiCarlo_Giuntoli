@@ -31,12 +31,13 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
   para decidir y la prueba, solo para medir el resultado final de cada modelo.
 - `RainfallTomorrow` se descarta porque es información del día siguiente (fuga de datos).
 - **Preparación de los datos** (sección 1.9 del notebook, siguiendo el apunte de la Unidad 0):
-  - En la función `preparar_columnas`, igual para los tres conjuntos, porque son fórmulas fijas: codificación
+  - En la función `preparar_columnas`, igual para los tres conjuntos, porque son fórmulas fijas: `Location` se
+    reemplaza por la latitud y la longitud de la ciudad (left join con `data/ciudades.csv`), codificación
     cíclica (seno y coseno) de las direcciones del viento y del mes, con seno y coseno en 0 en los días sin
     viento, y logaritmo de las variables con asimetría mayor a 1 (`Rainfall` y `Evaporation`).
   - En el `ColumnTransformer` `preprocesador`, ajustado solo con entrenamiento: `StandardScaler` y `KNNImputer`
-    (k = 5) para las numéricas, y moda y one-hot para `Location` (con todas sus columnas, por si aparece una
-    ciudad nueva) y `RainToday` (una sola columna 0/1). Se ajusta una sola vez, porque KNN tarda varios
+    (k = 5) para las numéricas (incluidas la latitud y la longitud), y moda y one-hot para `RainToday` (una sola
+    columna 0/1). Se ajusta una sola vez, porque KNN tarda varios
     minutos (se guarda en `data/preprocesado.joblib`), y los modelos se entrenan con los datos ya
     transformados.
 - **Modelo:** regresión logística con `class_weight='balanced'`.
@@ -44,8 +45,8 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
   (que no haya más falsas alarmas que lluvias detectadas). El umbral de decisión se elige en validación: el de
   mayor recall entre los que cumplen esa condición.
 
-Para el ítem 9: el script de inferencia tiene que aplicar `preparar_columnas` antes de usar `preprocesador` y el
-modelo. Lo que se aprende de los datos ya está en `preprocesador`. El umbral de decisión también hay que guardarlo.
+Para el ítem 9: el script de inferencia tiene que aplicar `preparar_columnas` (que necesita `data/ciudades.csv`)
+antes de usar `preprocesador` y el modelo. Lo que se aprende de los datos ya está en `preprocesador`. El umbral de decisión también hay que guardarlo.
 
 ## Entorno
 
@@ -97,7 +98,24 @@ TP_2/
 ├── TP-clasificacion-AA1.ipynb      Notebook con todo el desarrollo
 ├── data/
 │   ├── weatherAUS_2026C2.csv       Dataset
+│   ├── ciudades.csv                Latitud y longitud de la estación de cada ciudad (ver abajo)
 │   └── preprocesado.joblib         Datos preparados que guarda el notebook (no se versiona)
 └── referencia/
     └── consigna-TP2.pdf            Consigna
 ```
+
+## Fuente de `data/ciudades.csv`
+
+Las coordenadas son las de la estación meteorológica de cada ciudad, tomadas de la lista oficial de estaciones del
+Bureau of Meteorology de Australia (producto IDCJMC0014,
+[stations.zip](ftp://ftp.bom.gov.au/anon2/home/ncc/metadata/sitelists/stations.zip), descargado el 9/11/2026).
+El archivo guarda el nombre y el número de cada estación para poder verificarlas.
+
+Para cada ciudad se eligió la estación que usa la página de observaciones diarias (Daily Weather Observations) del
+Bureau para esa ciudad, que en las páginas que mezclan estaciones es la de la temperatura y la lluvia (por ejemplo,
+Watsonia usa Viewbank, Wollongong usa Bellambi y Uluru usa el aeropuerto de Yulara). Si la estación actual abrió
+después de 2017, se tomó la que funcionaba entre 2007 y 2017: Melbourne Regional Office, Sydney (Observatory Hill)
+066062 y Adelaide (Kent Town). Donde no se pudo confirmar la página de la ciudad y había más de una estación, se
+tomó la principal (la del aeropuerto o la oficina meteorológica, con número de la Organización Meteorológica
+Mundial): Cobar, Coffs Harbour, Canberra, Darwin, Cairns, Townsville, Sale, Gold Coast, Witchcliffe y Walpole.
+Katherine usa Tindal RAAF, a unos 15 km, que es la que el Bureau usa hoy para Katherine.
