@@ -16,9 +16,9 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
 | 1 | Análisis descriptivo y preparación de los datos | 30/10 | Hecho |
 | 2 | Regresión logística: métricas, curva ROC y umbral | 30/10 | Hecho |
 | 3 | Modelos base | 30/10 | Hecho |
-| 4 | Optimización de hiperparámetros | 13/11 | Pendiente |
-| 5 | Explicabilidad | 13/11 | Pendiente |
-| 6 | AutoML con PyCaret | 13/11 | Pendiente |
+| 4 | Optimización de hiperparámetros | 13/11 | Hecho |
+| 5 | Explicabilidad | 13/11 | Hecho |
+| 6 | AutoML con PyCaret | 13/11 | Hecho |
 | 7 | Red neuronal | 27/11 | Pendiente |
 | 8 | Comparación de modelos | 27/11 | Pendiente |
 | 9 | MLOps con Docker | 27/11 | Pendiente |
@@ -84,10 +84,10 @@ primero, TensorFlow falla con `DLL load failed`. Por eso, cuando se use la red n
 Abrir el notebook con el kernel **Python 3.11 (AA1 TP2)**. Lee `data/weatherAUS_2026C2.csv` con una ruta relativa, así que
 necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos.
 
-La primera ejecución tarda unos 15 minutos, casi todo por `KNNImputer`. El preprocesador ajustado y los datos
-preparados se guardan en `data/preprocesado.joblib`, que no se versiona, y las ejecuciones siguientes los cargan
-de ahí y tardan menos de un minuto. **Si se cambia algo de la preparación de los datos (sección 1.9 o
-anteriores), hay que borrar ese archivo** para que se vuelva a calcular.
+La primera ejecución tarda unos 25 minutos: 15 de `KNNImputer`, 5 de la búsqueda de hiperparámetros del ítem 4 y
+2 de PyCaret. El preprocesador ajustado y los datos preparados se guardan en `data/preprocesado.joblib`, que no se
+versiona, y las ejecuciones siguientes los cargan de ahí y tardan unos 10 minutos. **Si se cambia algo de la
+preparación de los datos (sección 1.9 o anteriores), hay que borrar ese archivo** para que se vuelva a calcular.
 
 ## Estructura
 
