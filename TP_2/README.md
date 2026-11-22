@@ -19,9 +19,9 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
 | 4 | Optimización de hiperparámetros | 13/11 | Hecho |
 | 5 | Explicabilidad | 13/11 | Hecho |
 | 6 | AutoML con PyCaret | 13/11 | Hecho |
-| 7 | Red neuronal | 27/11 | Pendiente |
-| 8 | Comparación de modelos | 27/11 | Pendiente |
-| 9 | MLOps con Docker | 27/11 | Pendiente |
+| 7 | Red neuronal | 27/11 | Hecho |
+| 8 | Comparación de modelos | 27/11 | Hecho |
+| 9 | MLOps con Docker | 27/11 | Hecho |
 | 10 | Conclusión | 27/11 | Pendiente |
 
 ## Decisiones que valen para todo el TP
@@ -40,13 +40,16 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
     columna 0/1). Se ajusta una sola vez, porque KNN tarda varios
     minutos (se guarda en `data/preprocesado.joblib`), y los modelos se entrenan con los datos ya
     transformados.
-- **Modelo:** regresión logística con `class_weight='balanced'`.
+- **Modelos:** regresión logística con `class_weight='balanced'` (ítems 2 a 5) y red neuronal con los mismos pesos
+  de clase (ítem 7). En la comparación del ítem 8, el mejor es la red con los hiperparámetros de Optuna.
 - **Métrica principal: recall de la clase "llueve"**, con la condición de que la precisión sea de al menos 0.5
   (que no haya más falsas alarmas que lluvias detectadas). El umbral de decisión se elige en validación: el de
   mayor recall entre los que cumplen esa condición.
 
-Para el ítem 9: el script de inferencia tiene que aplicar `preparar_columnas` (que necesita `data/ciudades.csv`)
-antes de usar `preprocesador` y el modelo. Lo que se aprende de los datos ya está en `preprocesador`. El umbral de decisión también hay que guardarlo.
+La carpeta [`docker/`](docker/) es el ítem 9: predice con la red con Optuna dentro de un contenedor. Cómo construir
+la imagen y correrla está en su [`readme.md`](docker/readme.md). `inferencia.py` repite `preparar_columnas` y usa el
+`preprocesador`, la red y el umbral que guarda la sección 9 del notebook. Esos archivos se vuelven a escribir en cada
+ejecución del notebook, así que si cambia el modelo hay que construir la imagen de nuevo.
 
 ## Entorno
 
@@ -76,18 +79,29 @@ El entorno ocupa unos 2.6 GB, sobre todo por TensorFlow. Si falta Python 3.11, e
 
 En Windows, TensorFlow tiene que importarse antes que scikit-learn. scikit-learn 1.4.2 trae su propia copia de
 una biblioteca de Visual C++ (`msvcp140.dll`), más vieja que la que necesita TensorFlow 2.21: si se carga
-primero, TensorFlow falla con `DLL load failed`. Por eso, cuando se use la red neuronal (ítem 7),
-`import tensorflow` va al principio de la celda de configuración.
+primero, TensorFlow falla con `DLL load failed`. Por eso `import tensorflow` va al principio de la celda de
+configuración, aunque la red neuronal recién aparece en el ítem 7.
 
 ## Cómo ejecutar
 
 Abrir el notebook con el kernel **Python 3.11 (AA1 TP2)**. Lee `data/weatherAUS_2026C2.csv` con una ruta relativa, así que
 necesita que la carpeta de trabajo sea `TP_2/`, algo que Jupyter y VS Code hacen solos.
 
-La primera ejecución tarda unos 25 minutos: 15 de `KNNImputer`, 5 de la búsqueda de hiperparámetros del ítem 4 y
-2 de PyCaret. El preprocesador ajustado y los datos preparados se guardan en `data/preprocesado.joblib`, que no se
-versiona, y las ejecuciones siguientes los cargan de ahí y tardan unos 10 minutos. **Si se cambia algo de la
-preparación de los datos (sección 1.9 o anteriores), hay que borrar ese archivo** para que se vuelva a calcular.
+La primera ejecución tarda casi 4 horas: 15 minutos de `KNNImputer`, 5 de la búsqueda de hiperparámetros del ítem 4,
+3 horas y 17 minutos de la búsqueda de la red neuronal del ítem 7 y 2 de PyCaret. Los cálculos largos se guardan en
+`data/`, no se versionan y las ejecuciones siguientes los cargan de ahí, así que tardan unos 11 minutos:
+
+- `preprocesado.joblib`: el preprocesador ajustado y los datos preparados (ítem 1).
+- `optuna_logistica.joblib`: la búsqueda de hiperparámetros de la regresión logística (ítem 4).
+- `optuna_red.joblib`: la búsqueda de hiperparámetros de la red neuronal (ítem 7).
+
+**Si se cambia algo de la preparación de los datos (sección 1.9 o anteriores), hay que borrar los tres archivos**,
+porque las búsquedas usan los datos preparados. Si se cambia solo una búsqueda, alcanza con borrar su archivo.
+
+En otra computadora, algunos resultados pueden salir apenas distintos aunque el código y las semillas sean los mismos:
+los modelos de árboles de PyCaret (ítem 6) y, en la cuarta cifra decimal, la regresión logística (alguna falsa alarma
+de más o de menos en las matrices del ítem 2). Después de ejecutar el notebook completo en otra computadora, hay que
+revisar que los números de esos textos coincidan con las salidas.
 
 ## Estructura
 
@@ -99,7 +113,19 @@ TP_2/
 ├── data/
 │   ├── weatherAUS_2026C2.csv       Dataset
 │   ├── ciudades.csv                Latitud y longitud de la estación de cada ciudad (ver abajo)
-│   └── preprocesado.joblib         Datos preparados que guarda el notebook (no se versiona)
+│   ├── preprocesado.joblib         Datos preparados que guarda el notebook (no se versiona)
+│   ├── optuna_logistica.joblib     Búsqueda de hiperparámetros del ítem 4 (no se versiona)
+│   └── optuna_red.joblib           Búsqueda de hiperparámetros del ítem 7 (no se versiona)
+├── docker/                         Inferencia en un contenedor (ítem 9, ver su readme.md)
+│   ├── Dockerfile
+│   ├── requirements.txt            Solo las librerías para predecir
+│   ├── inferencia.py
+│   ├── preprocesador.joblib        Preprocesador ajustado, red, umbral, coordenadas y días de ejemplo:
+│   ├── red.keras                   los guarda la sección 9 del notebook
+│   ├── umbral.json
+│   ├── ciudades.csv
+│   ├── dias_ejemplo.csv
+│   └── readme.md
 └── referencia/
     └── consigna-TP2.pdf            Consigna
 ```

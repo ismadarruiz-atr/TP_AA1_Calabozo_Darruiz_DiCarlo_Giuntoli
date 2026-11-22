@@ -3,5 +3,7 @@ __pycache__/
 .ipynb_checkpoints/
 # Registro que escribe PyCaret al ejecutarse
 logs.log
-# Datos preparados que guarda el notebook del TP2 para no recalcular KNN en cada ejecución
-TP_2/data/preprocesado.joblib
+# Cálculos largos que guarda el notebook del TP2 (KNN y las búsquedas de Optuna) para no repetirlos en cada ejecución
+TP_2/data/*.joblib
+# Salida de probar la imagen de Docker del TP2
+TP_2/docker/predicciones.csv
