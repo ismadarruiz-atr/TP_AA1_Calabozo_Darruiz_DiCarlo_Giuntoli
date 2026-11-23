@@ -1,4 +1,4 @@
-# Solo lo necesario para predecir, con las mismas versiones con las que se entrenó (las de ../requirements.txt).
+# Solo lo necesario para predecir, con las mismas versiones con las que se entrenó (las del entorno del TP).
 # scikit-learn tiene que ser la misma para cargar el preprocesador, y keras, la misma para cargar la red.
 # TensorFlow va en su versión sin soporte de GPU: para predecir alcanza y la imagen pesa mucho menos
 tensorflow-cpu==2.21.0
@@ -10,3 +10,8 @@ joblib==1.3.2
 # Dependencias de las anteriores, fijas porque scikit-learn 1.4.2 no funciona con numpy 2
 numpy==1.26.4
 scipy==1.11.4
+
+# Dependencias de TensorFlow y Keras que intervienen al cargar la red, fijas para que no cambien con el tiempo
+h5py==3.14.0
+ml_dtypes==0.5.4
+protobuf==7.36.2

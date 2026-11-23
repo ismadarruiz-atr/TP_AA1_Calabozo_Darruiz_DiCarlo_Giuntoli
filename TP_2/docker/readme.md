@@ -6,8 +6,8 @@ modelo del ítem 8.
 
 ## Contenido
 
-- `inferencia.py`: prepara los datos igual que el notebook, aplica el preprocesador y la red, y compara la
-  probabilidad con el umbral. No entrena nada.
+- `inferencia.py`: prepara los datos igual que el notebook (repite su función `preparar_columnas`), aplica el
+  preprocesador y la red, y compara la probabilidad con el umbral. No entrena nada.
 - `preprocesador.joblib`: el escalado, la imputación con KNN y el one-hot de `RainToday`, ajustados con el
   entrenamiento.
 - `red.keras`: la red entrenada.
@@ -51,9 +51,9 @@ Y con PowerShell:
 docker run --rm -v "${PWD}:/datos" lluvia-australia /datos/dias_ejemplo.csv /datos/predicciones.csv
 ```
 
-Imprime `10 días predichos en /datos/predicciones.csv` y deja `predicciones.csv` en esta carpeta. `--rm` borra el
-contenedor al terminar. Para `dias_ejemplo.csv`, las probabilidades y las predicciones tienen que ser las de la última
-tabla del notebook.
+Imprime `Días predichos: 10. Salida: /datos/predicciones.csv` y deja `predicciones.csv` en esta carpeta. `--rm`
+borra el contenedor al terminar. Para `dias_ejemplo.csv`, las probabilidades y las predicciones tienen que ser las de la
+última tabla del notebook.
 
 ## Formato de entrada y salida
 

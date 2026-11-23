@@ -10,7 +10,8 @@ import json
 import sys
 from pathlib import Path
 
-# En Windows, TensorFlow tiene que importarse antes que scikit-learn (joblib.load carga scikit-learn)
+# Si se corre en Windows, fuera de Docker, TensorFlow tiene que importarse antes que scikit-learn (joblib.load carga
+# scikit-learn). En el contenedor, que es Linux, el orden no importa
 import tensorflow as tf
 import joblib
 import numpy as np
@@ -71,7 +72,7 @@ def main(entrada, salida):
     dias['probabilidad_lluvia'] = prob.round(3)
     dias['llueve_manana'] = np.where(prob >= umbral, 'Yes', 'No')
     dias.to_csv(salida, index=False)
-    print(f'{len(dias)} días predichos en {salida}')
+    print(f'Días predichos: {len(dias)}. Salida: {salida}')
 
 
 if __name__ == '__main__':
