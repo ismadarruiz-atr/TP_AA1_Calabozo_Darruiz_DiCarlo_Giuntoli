@@ -1,10 +1,11 @@
 """Predice, a las 23:59 de cada día, si al día siguiente va a llover.
 
 Lee un CSV con las mediciones de un día (una fila por ciudad, con las mismas columnas que el dataset del TP) y escribe
-otro con dos columnas más: probabilidad_lluvia y llueve_manana ("Yes" o "No").
+otro con dos columnas más: probabilidad_lluvia y llueve_manana ("Yes" o "No"). Las filas de ciudades que no están en
+ciudades.csv quedan sin predicción.
 
 Uso:
-    python inferencia.py dias.csv predicciones.csv
+    python inferencia.py mediciones.csv predicciones.csv
 """
 import json
 import sys
@@ -51,9 +52,9 @@ def main(entrada, salida):
     red = tf.keras.models.load_model(CARPETA / 'red.keras')
     umbral = json.loads((CARPETA / 'umbral.json').read_text())['umbral']
 
-    dias = pd.read_csv(entrada)
+    mediciones = pd.read_csv(entrada)
 
-    X = dias.copy()
+    X = mediciones.copy()
     try:
         X['Date'] = pd.to_datetime(X['Date'])
         # Mismas columnas y en el mismo orden que al entrenar; las que sobran quedan afuera
@@ -61,21 +62,27 @@ def main(entrada, salida):
     except KeyError as error:
         sys.exit(f'Error: a {entrada} le falta una columna: {error}')
 
-    # Una ciudad que no está en ciudades.csv queda sin coordenadas, y el imputador se las inventaría
-    desconocidas = sorted(set(dias.loc[X['Latitud'].isna(), 'Location'].astype(str)))
+    # Una ciudad que no está en ciudades.csv queda sin coordenadas, y el imputador se las inventaría: esas filas no se
+    # predicen, pero las demás sí
+    conocidas = X['Latitud'].notna()
+    desconocidas = sorted(set(mediciones.loc[~conocidas, 'Location'].astype(str)))
     if desconocidas:
-        sys.exit(f'Error: estas ciudades no están en ciudades.csv: {", ".join(desconocidas)}')
+        print(f'Aviso: estas ciudades no están en ciudades.csv y quedaron sin predicción: {", ".join(desconocidas)}')
 
     # transform y predict, nunca fit: lo aprendido viene en los archivos
-    prob = red.predict(preprocesador.transform(X), verbose=0).ravel()
+    prob = pd.Series(np.nan, index=mediciones.index)
+    if conocidas.any():
+        prob[conocidas] = red.predict(preprocesador.transform(X[conocidas]), verbose=0).ravel()
 
-    dias['probabilidad_lluvia'] = prob.round(3)
-    dias['llueve_manana'] = np.where(prob >= umbral, 'Yes', 'No')
-    dias.to_csv(salida, index=False)
-    print(f'Días predichos: {len(dias)}. Salida: {salida}')
+    mediciones['probabilidad_lluvia'] = prob.round(3)
+    mediciones['llueve_manana'] = np.where(prob >= umbral, 'Yes', 'No')
+    # Las filas sin predicción quedan vacías
+    mediciones.loc[prob.isna(), 'llueve_manana'] = ''
+    mediciones.to_csv(salida, index=False)
+    print(f'Filas predichas: {conocidas.sum()} de {len(mediciones)}. Salida: {salida}')
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        sys.exit('Uso: python inferencia.py <dias.csv> <predicciones.csv>')
+        sys.exit('Uso: python inferencia.py <mediciones.csv> <predicciones.csv>')
     main(sys.argv[1], sys.argv[2])

@@ -22,7 +22,7 @@ mediciones climáticas de ese día en 49 ciudades de Australia. Todo el desarrol
 | 7 | Red neuronal | 27/11 | Hecho |
 | 8 | Comparación de modelos | 27/11 | Hecho |
 | 9 | MLOps con Docker | 27/11 | Hecho |
-| 10 | Conclusión | 27/11 | Pendiente |
+| 10 | Conclusión | 27/11 | Hecho |
 
 ## Decisiones que valen para todo el TP
 
@@ -120,11 +120,11 @@ TP_2/
 │   ├── Dockerfile
 │   ├── requirements.txt            Solo las librerías para predecir
 │   ├── inferencia.py
-│   ├── preprocesador.joblib        Preprocesador ajustado, red, umbral, coordenadas y días de ejemplo:
+│   ├── preprocesador.joblib        Preprocesador ajustado, red, umbral, coordenadas y mediciones de ejemplo:
 │   ├── red.keras                   los guarda la sección 9 del notebook
 │   ├── umbral.json
 │   ├── ciudades.csv
-│   ├── dias_ejemplo.csv
+│   ├── mediciones_ejemplo.csv
 │   └── readme.md
 └── referencia/
     └── consigna-TP2.pdf            Consigna

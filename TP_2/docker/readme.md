@@ -15,9 +15,9 @@ modelo del ítem 8.
 - `ciudades.csv`: la latitud y la longitud de cada ciudad.
 - `requirements.txt`: las librerías para predecir, con las mismas versiones del entrenamiento.
 - `Dockerfile`: cómo se arma la imagen.
-- `dias_ejemplo.csv`: 10 días del conjunto de prueba, para probar la imagen.
+- `mediciones_ejemplo.csv`: 10 filas del conjunto de prueba, para probar la imagen.
 
-Los binarios, `ciudades.csv` y `dias_ejemplo.csv` los genera la sección 9 del notebook.
+Los binarios, `ciudades.csv` y `mediciones_ejemplo.csv` los genera la sección 9 del notebook.
 
 ## Construir la imagen
 
@@ -35,25 +35,25 @@ El contenedor solo ve las carpetas que se le montan. Se monta la carpeta actual 
 entrada y la salida con esa ruta. En Linux o macOS:
 
 ```bash
-docker run --rm -v "$(pwd)":/datos lluvia-australia /datos/dias_ejemplo.csv /datos/predicciones.csv
+docker run --rm -v "$(pwd)":/datos lluvia-australia /datos/mediciones_ejemplo.csv /datos/predicciones.csv
 ```
 
 En Windows, con Git Bash, hay que agregar `MSYS_NO_PATHCONV=1` adelante, porque si no Git Bash cambia las rutas que
 empiezan con `/`:
 
 ```bash
-MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd)":/datos lluvia-australia /datos/dias_ejemplo.csv /datos/predicciones.csv
+MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd)":/datos lluvia-australia /datos/mediciones_ejemplo.csv /datos/predicciones.csv
 ```
 
 Y con PowerShell:
 
 ```powershell
-docker run --rm -v "${PWD}:/datos" lluvia-australia /datos/dias_ejemplo.csv /datos/predicciones.csv
+docker run --rm -v "${PWD}:/datos" lluvia-australia /datos/mediciones_ejemplo.csv /datos/predicciones.csv
 ```
 
-Imprime `Días predichos: 10. Salida: /datos/predicciones.csv` y deja `predicciones.csv` en esta carpeta. `--rm`
-borra el contenedor al terminar. Para `dias_ejemplo.csv`, las probabilidades y las predicciones tienen que ser las de la
-última tabla del notebook.
+Imprime `Filas predichas: 10 de 10. Salida: /datos/predicciones.csv` y deja `predicciones.csv` en esta carpeta (no
+dentro de la imagen: `/datos` es esta misma carpeta). `--rm` borra el contenedor al terminar. Para
+`mediciones_ejemplo.csv`, las probabilidades y las predicciones tienen que ser las de la última tabla del notebook.
 
 ## Formato de entrada y salida
 
@@ -61,8 +61,9 @@ Entrada: un CSV con una fila por ciudad y por día, con las columnas del dataset
 `MinTemp`, `MaxTemp`, `Rainfall`, `Evaporation`, `Sunshine`, `WindGustDir`, `WindGustSpeed`, `WindDir9am`,
 `WindDir3pm`, `WindSpeed9am`, `WindSpeed3pm`, `Humidity9am`, `Humidity3pm`, `Pressure9am`, `Pressure3pm`,
 `Cloud9am`, `Cloud3pm`, `Temp9am`, `Temp3pm` y `RainToday`. Las celdas vacías se imputan con lo aprendido en el
-entrenamiento. Las columnas que sobran no se usan y pasan tal cual a la salida. Si falta una columna, o si una ciudad
-no está en `ciudades.csv`, el script termina con un error que dice cuál.
+entrenamiento. Las columnas que sobran no se usan y pasan tal cual a la salida. Si falta una columna, el script
+termina con un error que dice cuál. Si una ciudad no está en `ciudades.csv`, sus filas no se predicen (no hay
+coordenadas que darle a la red) y el script avisa cuáles son; las demás filas se predicen igual.
 
 Salida: el mismo CSV con dos columnas más: `probabilidad_lluvia`, redondeada a tres decimales, y `llueve_manana`, que
-es `Yes` si la probabilidad llega al umbral y `No` si no.
+es `Yes` si la probabilidad llega al umbral y `No` si no. En las filas sin predicción las dos quedan vacías.
